@@ -32,7 +32,15 @@ class HashTable:
 
         OPTIONAL STRETCH: Research and implement DJB2
         '''
-        pass
+        # Consulted this source: http://www.cse.yorku.ca/~oz/hash.html
+        # as well as the code Grant wrote in class.
+        # The site is confusing because it has both "33 ^ str[i]" and
+        # "33 + c", but further researched showed the latter seems to be correct.
+        bytes_key = key.encode()
+        hash_value = 5381
+        for char in bytes_key:
+            hash_value = hash_value * 33 + char
+        return hash_value
 
 
     def _hash_mod(self, key):
@@ -40,7 +48,7 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         within the storage capacity of the hash table.
         '''
-        return self._hash(key) % self.capacity
+        return self._hash_djb2(key) % self.capacity
 
 
     def insert(self, key, value):
