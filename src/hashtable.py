@@ -54,8 +54,16 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        index = self._hash_mod(key)
+        if not self.storage[index]:
+            new_node = LinkedPair(key, value)
+            self.storage[index] = new_node
+        else:
+            node = self.storage[index]
+            if key == node.key:
+                node.value = value
+            else:
+                raise ValueError('Hash collision')
 
 
     def remove(self, key):
@@ -66,7 +74,15 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+        node = self.storage[index]
+        if node:
+            if node.key == key:
+                self.storage[index] = None
+            else:
+                raise KeyError('key not found')
+        else:
+            raise KeyError('key not found')
 
 
     def retrieve(self, key):
@@ -77,7 +93,12 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
+        index = self._hash_mod(key)
+        node = self.storage[index]
+        if node:
+            if node.key == key:
+                return node.value
+        raise KeyError('key not found')
 
 
     def resize(self):
@@ -87,8 +108,11 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        self.capacity *= 2
+        new_storage = [None] * self.capacity
+        for i in range(len(self.storage)):
+            new_storage[i] = self.storage[i]
+        self.storage = new_storage
 
 
 if __name__ == "__main__":
