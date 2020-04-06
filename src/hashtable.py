@@ -60,10 +60,18 @@ class HashTable:
             self.storage[index] = new_node
         else:
             node = self.storage[index]
-            if key == node.key:
-                node.value = value
-            else:
-                raise ValueError('Hash collision')
+            value_set = False
+            while node:
+                prev_node = node
+                if key == node.key:
+                    node.value = value
+                    value_set = True
+                    break
+                else:
+                    node = node.next
+            if not value_set:
+                new_node = LinkedPair(key, value)
+                prev_node.next = new_node
 
 
     def remove(self, key):
@@ -76,14 +84,22 @@ class HashTable:
         '''
         index = self._hash_mod(key)
         node = self.storage[index]
-        if node:
+        prev_node = None
+        key_found = False
+        while node:
             if node.key == key:
-                self.storage[index] = None
+                if not prev_node:
+                    self.storage[index] = node.next
+                else:
+                    prev_node.next = node.next
+                key_found = True
+                break
             else:
-                raise KeyError('key not found')
-        else:
+                prev_node = node
+                node = node.next
+        if not key_found:
             raise KeyError('key not found')
-
+    
 
     def retrieve(self, key):
         '''
@@ -95,10 +111,15 @@ class HashTable:
         '''
         index = self._hash_mod(key)
         node = self.storage[index]
-        if node:
+        key_found = False
+        while node:
             if node.key == key:
+                key_found = True
                 return node.value
-        raise KeyError('key not found')
+            else:
+                node = node.next
+        if not key_found:
+            return None
 
 
     def resize(self):
@@ -109,10 +130,13 @@ class HashTable:
         Fill this in.
         '''
         self.capacity *= 2
-        new_storage = [None] * self.capacity
-        for i in range(len(self.storage)):
-            new_storage[i] = self.storage[i]
-        self.storage = new_storage
+        old_storage = self.storage
+        self.storage = [None] * self.capacity
+        for i in range(len(old_storage)):
+            node = old_storage[i]
+            while node:
+                self.insert(node.key, node.value)
+                node = node.next
 
 
 if __name__ == "__main__":
